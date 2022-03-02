@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    projectcontour.io/tls-cert-namespace: tlsadmin
+  name: tea-ingress
+  namespace: tea
+spec:
+  rules:
+  - host: teas.gsslabs.org
+    http:
+      paths:
+      - path: /tea
+        pathType: Prefix
+        backend:
+          service:
+            name: tea-svc
+            port:
+              number: 80

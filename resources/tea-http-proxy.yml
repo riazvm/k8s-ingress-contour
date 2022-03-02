@@ -1,0 +1,16 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: tea-proxy
+  namespace: tea
+spec:
+  virtualhost:
+    fqdn: teas.gsslabs.org
+    tls:
+      secretName: tlsadmin/admin-tls-secret
+  routes:
+    - conditions:
+      - prefix: /tea
+      services:
+        - name: tea-svc
+          port: 80
