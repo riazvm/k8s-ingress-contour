@@ -6,8 +6,12 @@ metadata:
   name: coffee-ingress
   namespace: coffee
 spec:
+  tls:
+  - hosts:
+    - coffees.gsslabs.org
+    secretName: admin-tls-secret
   rules:
-  - host: coffee.gsslabs.org
+  - host: coffees.gsslabs.org
     http:
       paths:
       - path: /coffee
