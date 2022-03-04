@@ -235,25 +235,24 @@ Create a http proxy for the coffee app (definitions under resources) with TLS de
  > kubectl apply coffee-proxy.yml 
 
 ```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
 metadata:
-  annotations:
-    projectcontour.io/tls-cert-namespace: tlsadmin
-  name: coffee-ingress
+  name: coffee-proxy
   namespace: coffee
 spec:
-  rules:
-  - host: coffees.gsslabs.org
-    http:
-      paths:
-      - path: /coffee
-        pathType: Prefix
-        backend:
-          service:
-            name: coffee-svc
-            port:
-              number: 80
+  virtualhost:
+    fqdn: coffees.gsslabs.org
+    tls:
+      secretName: tlsadmin/admin-tls-secret
+  routes:
+    - conditions:
+      - prefix: /coffee
+      services:
+        - name: coffee-svc
+          port: 80
+
 ```
 
 Configure DNS with the envoy proxy load balancer ip that was retrieved in the nitial step
@@ -271,3 +270,30 @@ Test and verify from browser , also check cert
 
 NOTE: If you would like to use the Ingress resource instead of the proxy the samples are provided under resources
 
+
+```yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    projectcontour.io/tls-cert-namespace: tlsadmin
+  name: coffee-ingress
+  namespace: coffee
+spec:
+  tls:
+  - hosts:
+    - coffees.gsslabs.org
+    secretName: admin-tls-secret
+  rules:
+  - host: coffees.gsslabs.org
+    http:
+      paths:
+      - path: /coffee
+        pathType: Prefix
+        backend:
+          service:
+            name: coffee-svc
+            port:
+              number: 80
+```
